@@ -27,14 +27,64 @@ const articleSchema = {
 
 const Article = mongoose.model("Article" , articleSchema);
 
-app.get("/" , function(req , res){
+app.get("/articles" , function(req , res){
 
   Article.find({} , function(err , results){
 
+    if(err){
 
+      res.send(err);
+
+
+    }
+
+    else{
+
+      res.send(results);
+
+    }
   })
 
 });
+
+app.post("/articles" , function(req , res){
+
+  console.log(req.body.title);
+  console.log(req.body.content);
+
+  const newArticle = new Article({
+    title : req.body.title,
+    content : req.body.content
+  });
+
+  newArticle.save(function(err){
+
+    if(err){
+      res.send(err);
+    }
+
+    else{
+
+      res.send("Succesfully added!");
+    }
+  });
+});
+
+app.delete("/articles" , function(req , res){
+
+  Article.deleteMany(function(err){
+
+    if(err){
+
+      res.send("Oh no!");
+    }
+
+    else{
+
+      res.send("Successfully deleted all the items!");
+    }
+  })
+})
 
 
 app.listen(3000 , function(){
