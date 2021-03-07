@@ -27,30 +27,21 @@ const articleSchema = {
 
 const Article = mongoose.model("Article" , articleSchema);
 
-app.get("/articles" , function(req , res){
+app.route("/articles").get((req , res)=>{
 
   Article.find({} , function(err , results){
 
     if(err){
-
       res.send(err);
-
-
     }
 
     else{
-
       res.send(results);
 
     }
   })
-
-});
-
-app.post("/articles" , function(req , res){
-
-  console.log(req.body.title);
-  console.log(req.body.content);
+})
+.post((req , res)=>{
 
   const newArticle = new Article({
     title : req.body.title,
@@ -68,9 +59,9 @@ app.post("/articles" , function(req , res){
       res.send("Succesfully added!");
     }
   });
-});
+})
 
-app.delete("/articles" , function(req , res){
+.delete((req , res)=>{
 
   Article.deleteMany(function(err){
 
@@ -84,8 +75,83 @@ app.delete("/articles" , function(req , res){
       res.send("Successfully deleted all the items!");
     }
   })
+
+});
+
+app.route("/articles/:param")
+
+.get( function(req , res){
+
+  const curr_title = req.params.param;
+
+  Article.findOne({title : curr_title} , function(err , result){
+
+    if(err || !result){
+
+      res.send("Article not found!");
+    }
+
+    else{
+
+      res.send(result);
+    }
+  })
+
+
 })
 
+.put((req , res)=>{
+
+  const curr_title = req.params.param;
+  Article.update({ title : curr_title},{title : req.body.title,content : req.body.content},{  overwrite : true},function(err){
+      if(err){
+        res.send(err);
+      }
+
+      else{
+
+        res.send("Successfully updated!");
+      }
+    })
+
+  })
+
+.patch(function(req , res){
+
+  const curr_title = req.params.param;
+  Article.update({ title : curr_title},
+    {  $set : req.body},
+    function(err){
+      if(err){
+        res.send(err);
+      }
+
+      else{
+
+        res.send("Successfully updated!");
+      }
+    })
+
+
+})
+
+.delete(function(req , res){
+  const curr_title = req.params.param;
+
+  Article.deleteOne({title : curr_title} , function(err){
+
+    if(err){
+
+      res.send("Not delelted!");
+    }
+
+    else{
+
+      res.send("Deleted successfully!")
+    }
+  })
+
+});
 
 app.listen(3000 , function(){
 
